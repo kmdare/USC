@@ -5,9 +5,9 @@
 import os
 import re
 import numpy
-import signal
+import scipy.signal as signal
 import scipy.stats as stats
-from typing import Tuple, Callable
+from typing import Tuple, Callable, Dict
 from nptyping import NDArray, Float64
 
 __author__ = "Kahan Dare"
@@ -73,7 +73,7 @@ def load_header(fname: str) -> dict:
 
 
 def chisquare(f: Callable, x: NDArray[float], y: NDArray[float],
-              p: dict[str, float]) -> float:
+              p: Dict[str, float]) -> float:
     '''Computes the Chi-Square goodness of fit test
 
     args:
@@ -86,13 +86,13 @@ def chisquare(f: Callable, x: NDArray[float], y: NDArray[float],
     return chi2
 
 
-def PSD(x: NDArray[float], timestep: float,
-        bandwidth=1000) -> Tuple[NDArray[float], NDArray[float]]:
+def PSD(x: NDArray[float], SI: float, 
+        bandwidth=1000, **kwargs) -> Tuple[NDArray[float], NDArray[float]]:
     '''Takes a given timetrace and computs the power spectral desity
 
     args:
         - x: The given timetrace
-        - timestep: The timesteps between the points
+        - SI: The sample interval
 
     kwargs:
         - bandwidth: The bandwidth of the fft
@@ -102,7 +102,8 @@ def PSD(x: NDArray[float], timestep: float,
         - f: Array of the sample frequencies
         - Pxx: Array of the Power spectral density (only positive side)
     '''
-    sample = 1/(timestep * bandwidth)  #The sample size
-    f, Pxx = signal.welch(x, 1 / timestep, nperseg=sample)  # uses the Signal function to calculate
-    return (f, Pxx)
+    sample = 1/(SI * bandwidth)  # The sample size
+    kwargs["nperseg"] = sample
 
+    f, Pxx = signal.welch(x, 1 / SI, **kwargs)
+    return (f, Pxx)
