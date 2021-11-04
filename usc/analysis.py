@@ -75,4 +75,3 @@ def load_header(dname, fname="Header.dat"):
     settings["Resolution"] = int(settings["Resolution"])
     settings["SampleInterval"] = float(settings["SampleInterval"])
     return settings
-
