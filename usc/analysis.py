@@ -1,64 +1,57 @@
 #!/usr/bin/env python
-'''Tools for calculating the correlations in ultrastrong coupling data sets
+'''Tools for analysing ultrastrong coupling data sets
 '''
 
-import os
 import re
 import numpy
+import scipy.stats as stats
+from typing import Tuple, Callable
+from nptyping import NDArray, Float64
 
-__author__ = "Kahan Dare"
-__credits__ = ["Kahan Dare"]
+__author__ = "Kahan Dare & Jannek Hansen"
+__credits__ = ["Kahan Dare & Jannek Hansen"]
 __version__ = "1.0.0"
 __maintainer__ = "Kahan Dare"
 __email__ = "kahan.mcaffer.dare@univie.ac.at"
 __status__ = "Development"
 
 
-def load_data(dname, fname, count=-1, offset=0):
+def load_pico(fname: str, count=-1, offset=0) -> Tuple[dict, NDArray[float]]:
     '''Loads picoscope data
 
     args:
-        - dname (string): The relative path from this location to the data
-        file.
-        - fname (string): The file name of the data set.
+        - fname: The relative path from this location to the data file.
 
     returns:
-        - settings (dict): A dictionary containing the settings and comments
-        from the header file.
-        - data (numpy.array): The data in a 2D array with columns being the
-        different channels
+        - settings: A dictionary containing the settings and comments from the
+        header file.
+        - data: The data in a 2D array with columns for each channel
     '''
     # Reading the header file
     header_file_name = fname.replace(".bin", "_header.dat")
-    try:
-        settings = load_header(dname, fname=header_file_name)
-    except FileNotFoundError:
-        print("Could not find {}.".format(header_file_name))
-        print("Attempting to load default header.")
-        settings = load_header(dname)
+    settings = load_header(header_file_name)
 
     # Reading the data file
-    data = numpy.fromfile(os.path.join(dname, fname), dtype=numpy.int16,
-                          count=count, offset=offset)
+    data = numpy.fromfile(fname, dtype=numpy.int16, count=count, offset=offset)
     N_channels = len(settings["Channels"].keys())
     data = data.reshape((len(data)//N_channels, N_channels))
     return (settings, data)
 
 
-def load_header(dname, fname="Header.dat"):
+def load_header(fname: str) -> dict:
     '''Loads the header file containing all the headings
 
     args:
-        - dname (string): The data set directory.
-        - fname (string): The header file's name.
+        - dname: The data set directory.
+        - fname: The header file's name.
 
     returns:
-        - settings (dict): A dictionary containing the settings and comments
-        from the header file.
+        settings: A dictionary containing the settings and comments from the
+        header file.
     '''
     settings = dict()
     channel_dict = dict()
-    with open(os.path.join(dname, fname), "r") as f:
+    with open(fname, "r") as f:
         for i, line in enumerate(f):
             try:
                 label, value = re.split('=|\:', line)
@@ -75,3 +68,17 @@ def load_header(dname, fname="Header.dat"):
     settings["Resolution"] = int(settings["Resolution"])
     settings["SampleInterval"] = float(settings["SampleInterval"])
     return settings
+
+
+def chisquare(f: Callable, x: NDArray[float], y: NDArray[float],
+              p: dict[str, float]) -> float:
+    '''Computes the Chi-Square goodness of fit test
+
+    args:
+        - f: The fit function
+        - x: The independent variable
+        - y: The dependent variable
+        - p: The other function parameters
+    '''
+    chi2, _ = stats.chisquare(f_obs=y, f_exp=f(x, p))
+    return chi2
