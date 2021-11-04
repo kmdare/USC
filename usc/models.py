@@ -1,5 +1,16 @@
+#!/usr/bin/env python
+'''Tools for calculating the correlations in ultrastrong coupling data sets
+'''
+
 import numpy
 from nptyping import NDArray, Float64
+
+__author__ = "Kahan Dare & Jannek Hansen"
+__credits__ = ["Kahan Dare & Jannek Hansen"]
+__version__ = "1.0.0"
+__maintainer__ = "Kahan Dare"
+__email__ = "kahan.mcaffer.dare@univie.ac.at"
+__status__ = "Development"
 
 
 def chi_l(w: NDArray[Float64], p: dict[str, Float64]) -> NDArray[Float64]:

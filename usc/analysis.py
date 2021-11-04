@@ -5,7 +5,6 @@
 import os
 import re
 import numpy
-from scipy import signal
 
 __author__ = "Kahan Dare"
 __credits__ = ["Kahan Dare"]
@@ -76,23 +75,3 @@ def load_header(dname, fname="Header.dat"):
     settings["Resolution"] = int(settings["Resolution"])
     settings["SampleInterval"] = float(settings["SampleInterval"])
     return settings
-
-
-def estimate_power_spectral_density(x,timestep, bandwidth = 1000):
-    '''Takes a given timetrace and computs the power spectral desity
-
-    args:
-        - x: The given timetrace
-        - timestep: The timesteps between the points
-        - bandwidth: The bandwidth of the fft
-
-
-    returns:
-        - f (NDArray[Float64]): Array of the sample frequencies
-        - Pxx (NDarray[Float64]): Array of the Power spectral density (only positive side)
-    '''
-    sample = 1/(timestep * bandwidth)                           #The sample size
-    f, Pxx = signal.welch(x, 1 / timestep, nperseg = sample)    #uses the Signal function to calculate
-    return (f, Pxx) 
-
-
