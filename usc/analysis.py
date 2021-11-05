@@ -108,7 +108,8 @@ def PSD(x: NDArray[float], SI: float,
     f, Pxx = signal.welch(x, 1 / SI, **kwargs)
     return (f, Pxx)
 
-def save_data(path: String, filename: String, f: NDArray[float], Pxx: NDArray[float]):
+
+def save_data(path: str, filename: str, f: NDArray[float], Pxx: NDArray[float]):
     '''Takes the Powerspectrum and the frequency array and saves them in a txt file
 
     args:
@@ -119,17 +120,18 @@ def save_data(path: String, filename: String, f: NDArray[float], Pxx: NDArray[fl
     returns:
         - void, saves data to txt file
     '''    
-    np.savetxt(path+filenme+"txt",np.array([f,Pxx]).T, delimiter=',',header= "freq,pxx")
+    np.savetxt(path+filename+"txt",np.array([f,Pxx]).T, delimiter=',',header= "freq,pxx")
 
 
-def read_data(path: String, filename: String):
-        '''Extracts the Powerspectum and frequency from a txt file 
+def read_data(path: str, filename: str ):
+    '''Extracts the Powerspectum and frequency from a txt file 
     args:
         - path: where is the data
         - filename: how is it called
     returns:
         - f, Pxx 
     '''    
-    f, Pxx = np.loadtxt(out_name, delimiter=',', usecols=(0, 1), unpack=True)
+    f, Pxx = np.loadtxt(path+filename+"txt", delimiter=',', usecols=(0, 1), unpack=True)
     return(f, Pxx)
+
 
