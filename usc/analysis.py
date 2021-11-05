@@ -120,7 +120,7 @@ def save_data(path: str, filename: str, f: NDArray[float], Pxx: NDArray[float]):
     returns:
         - void, saves data to txt file
     '''    
-    np.savetxt(path+filename+"txt",np.array([f,Pxx]).T, delimiter=',',header= "freq,pxx")
+    numpy.savetxt(path+filename+".txt",numpy.array([f,Pxx]).T, delimiter=',',header= "freq[Hz], pxx[Unit]")
 
 
 def read_data(path: str, filename: str ):
@@ -131,7 +131,7 @@ def read_data(path: str, filename: str ):
     returns:
         - f, Pxx 
     '''    
-    f, Pxx = np.loadtxt(path+filename+"txt", delimiter=',', usecols=(0, 1), unpack=True)
+    f, Pxx = numpy.loadtxt(path+filename+".txt", delimiter=',', usecols=(0, 1), unpack=True)
     return(f, Pxx)
 
 
