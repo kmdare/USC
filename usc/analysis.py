@@ -86,8 +86,7 @@ def chisquare(f: Callable, x: NDArray[float], y: NDArray[float],
     return chi2
 
 
-def PSD(x: NDArray[float], SI: float, 
-        bandwidth=1000, **kwargs) -> Tuple[NDArray[float], NDArray[float]]:
+def PSD(x: NDArray[float], SI: float, bandwidth=1000, **kwargs) -> Tuple[NDArray[float], NDArray[float]]:
     '''Takes a given timetrace and computs the power spectral desity
 
     args:
@@ -102,9 +101,8 @@ def PSD(x: NDArray[float], SI: float,
         - f: Array of the sample frequencies
         - Pxx: Array of the Power spectral density (only positive side)
     '''
-    sample = 1/(SI * bandwidth)  # The sample size
+    sample = int(1/(SI * bandwidth))  # The sample size
     kwargs["nperseg"] = sample
-
     f, Pxx = signal.welch(x, 1 / SI, **kwargs)
     return (f, Pxx)
 
