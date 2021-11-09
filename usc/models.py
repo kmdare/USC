@@ -4,6 +4,7 @@
 
 import numpy
 from numpy import sqrt, real, conj
+from typing import Dict
 from nptyping import NDArray
 
 __author__ = "Kahan Dare & Jannek Hansen"
@@ -14,7 +15,7 @@ __email__ = "kahan.mcaffer.dare@univie.ac.at"
 __status__ = "Development"
 
 
-def chi_l(w: NDArray[float], p: dict[str, float]) -> NDArray[float]:
+def chi_l(w: NDArray[float], p: Dict[str, float]) -> NDArray[float]:
     """The complex optical susceptibility.
 
     args:
@@ -29,7 +30,7 @@ def chi_l(w: NDArray[float], p: dict[str, float]) -> NDArray[float]:
     return 1/(0.5 * k1 + 0.5 * k2 - 1j * (w-d))
 
 
-def chi_m(w: NDArray[float], p: dict[str, float]) -> NDArray[float]:
+def chi_m(w: NDArray[float], p: Dict[str, float]) -> NDArray[float]:
     """The complex mechanical susceptibility.
 
     args:
@@ -43,7 +44,7 @@ def chi_m(w: NDArray[float], p: dict[str, float]) -> NDArray[float]:
     return 1/(0.5 * y - 1j * (w-M))
 
 
-def nu(w: NDArray[float], p: dict[str, float]) -> NDArray[float]:
+def nu(w: NDArray[float], p: Dict[str, float]) -> NDArray[float]:
     """Part of the USC theory for the mechanical spectra.
 
     args:
@@ -60,7 +61,7 @@ def nu(w: NDArray[float], p: dict[str, float]) -> NDArray[float]:
                             * (chi_m(w, p) - conj(chi_m(-w, p)))))
 
 
-def Sxx(w: NDArray[float], p: dict[str, float]) -> NDArray[float]:
+def Sxx(w: NDArray[float], p: Dict[str, float]) -> NDArray[float]:
     """Full USC theory for the mechanical spectra.
 
     args:
@@ -86,7 +87,7 @@ def Sxx(w: NDArray[float], p: dict[str, float]) -> NDArray[float]:
     return A + B + C
 
 
-def Avoided_Crossing_SC(d: float, p: dict[str, float],
+def Avoided_Crossing_SC(d: float, p: Dict[str, float],
                         pm=1) -> NDArray[float]:
     """Typical strong coupling theory for normal mode frequencies
 
@@ -105,7 +106,7 @@ def Avoided_Crossing_SC(d: float, p: dict[str, float],
     return 0.5 * (M + d) + pm * 0.5 * sqrt((M - d)**2 + (2*g)**2)
 
 
-def Normal_Mode_Splitting_SC(g: float, p: dict[str, float],
+def Normal_Mode_Splitting_SC(g: float, p: Dict[str, float],
                              pm=1) -> NDArray[float]:
     """Typical strong coupling theory for normal mode frequencies
 
@@ -122,7 +123,7 @@ def Normal_Mode_Splitting_SC(g: float, p: dict[str, float],
     return numpy.real(1 + pm * sqrt(g**2 - (k/4)**2))
 
 
-def Normal_Mode_Splitting_USC(g: float, p: dict[str, float],
+def Normal_Mode_Splitting_USC(g: float, p: Dict[str, float],
                               pm=1) -> NDArray[float]:
     """Ultra-strong coupling theory for normal mode frequencies
 
