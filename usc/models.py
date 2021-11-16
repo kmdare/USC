@@ -87,6 +87,44 @@ def Sxx(w: NDArray[float], p: Dict[str, float]) -> NDArray[float]:
     return A + B + C
 
 
+def SII_Het(w: NDArray[float], p: Dict[str, float]) -> NDArray[float]:
+    """Full USC theory for the heterodyne spectra.
+
+    args:
+        - w: The frequencies over which the spectra should be computed
+        - p: The system parameters, should include:
+            - d: the detuning of the tweezer relative to the cavity
+            - k1, k2: the loss rates of the cavity mirrors with kappa=k1+k2
+            - y: the gas damping rate
+            - g: the coupling rate
+            - M: the mechanical frequency
+            - N: the mechanical occupation
+            - w_het: the heterodyne frequency
+    """
+    y = p["y"]
+    N = p["N"]
+    g = p["g"]
+    k1 = p["k1"]
+    k2 = p["k2"]
+    w_het = p["w_het"]
+    nu2 = numpy.abs(nu(w+w_het, p))**2
+    A = numpy.abs(k1*chi_l(w+w_het, p)*nu(w+w_het, p)-1)**2
+    B = k1*k2*numpy.abs(chi_l(w+w_het, p))**2*nu2
+
+    C = -(2 * g**2 * k1 * (k1+k2)
+          * numpy.abs(nu(w+w_het, p))**2
+          * numpy.abs(chi_l(w+w_het, p))**2
+          * numpy.real(numpy.conj(chi_l(-w-w_het, p))
+                       * (chi_m(w+w_het, p)-numpy.conj(chi_m(-w-w_het, p)))))
+
+    A = numpy.abs(nu(w, p))**2 * y * (N+1) * numpy.abs(chi_m(w, p))**2
+    B = numpy.abs(nu(w, p))**2 * y * N * numpy.abs(chi_m(-w, p))**2
+    C = (numpy.abs(nu(w, p))**2 * g**2 * (k1 + k2)
+         * numpy.abs(chi_m(w, p) - conj(chi_m(-w, p)))**2
+         * numpy.abs(chi_l(w, p))**2)
+    return A + B + C
+
+
 def Avoided_Crossing_SC(d: float, p: Dict[str, float],
                         pm=1) -> NDArray[float]:
     """Typical strong coupling theory for normal mode frequencies

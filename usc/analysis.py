@@ -72,8 +72,8 @@ def load_header(fname: str) -> dict:
     return settings
 
 
-def chisquare(f: Callable, x: NDArray[float], y: NDArray[float],
-              p: Dict[str, float]) -> float:
+def chisquare(p: NDArray[float], x: NDArray[float], y: NDArray[float],
+              f: Callable) -> float:
     '''Computes the Chi-Square goodness of fit test
 
     args:
@@ -82,7 +82,7 @@ def chisquare(f: Callable, x: NDArray[float], y: NDArray[float],
         - y: The dependent variable
         - p: The other function parameters
     '''
-    chi2, _ = stats.chisquare(f_obs=y, f_exp=f(x, p))
+    chi2, _ = stats.chisquare(f_obs=y, f_exp=f(p, x))
     return chi2
 
 
@@ -107,29 +107,30 @@ def PSD(x: NDArray[float], SI: float, bandwidth=1000, **kwargs) -> Tuple[NDArray
     return (f, Pxx)
 
 
-def save_data(path: str, filename: str, f: NDArray[float], Pxx: NDArray[float]):
+def save_data(filepath: str, f: NDArray[float], Pxx: NDArray[float]):
     '''Takes the Powerspectrum and the frequency array and saves them in a txt file
 
     args:
         - path: where do you want the data
-        - filename: 
+        - filename:
         - f: The given frequency span
         - Pxx: The given spectrum
     returns:
         - void, saves data to txt file
-    '''    
-    numpy.savetxt(path+filename+".txt",numpy.array([f,Pxx]).T, delimiter=',',header= "freq[Hz], pxx[Unit]")
+    '''
+    numpy.savetxt(filepath, numpy.array([f, Pxx]).T, delimiter=',',
+                  header="freq[Hz], pxx[Unit]")
 
 
-def read_data(path: str, filename: str ):
-    '''Extracts the Powerspectum and frequency from a txt file 
+def read_data(filepath: str):
+    '''Extracts the Powerspectum and frequency from a txt file
     args:
         - path: where is the data
         - filename: how is it called
     returns:
-        - f, Pxx 
-    '''    
-    f, Pxx = numpy.loadtxt(path+filename+".txt", delimiter=',', usecols=(0, 1), unpack=True)
+        - f, Pxx
+    '''
+    f, Pxx = numpy.loadtxt(filepath, delimiter=',', usecols=(0, 1),
+                           unpack=True)
     return(f, Pxx)
-
 
