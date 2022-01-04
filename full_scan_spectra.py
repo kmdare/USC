@@ -26,7 +26,7 @@ def PSD(filepath, bandwidth=1000, N_chunk_avgs=1):
         _, data = usc.analysis.load_pico(filepath, count=count, offset=offset)
         for i in range(data.shape[1]):
             f, Pxx = usc.analysis.PSD(data[:, i], SI, bandwidth=bandwidth,
-                                      noverlap=0)
+                                      noverlap=int(0.9*N_sample))
             if Pii is None:
                 Pii = numpy.array(data.shape[1]*[0])
                 Pii = numpy.zeros((len(Pxx), data.shape[1]))
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         #     else:
         #         f, Pxx = usc.analysis.PSD(data[:, j], SI, noverlap=0)
         #         usc.analysis.save_data(save_filepath, f, Pxx)
-        settings, f, Pii = PSD(load_filepath, N_chunk_avgs=100)
+        settings, f, Pii = PSD(load_filepath,bandwidth=500, N_chunk_avgs=200)
         for j in range(Pii.shape[1]):
             ch_label = settings["Channels"][CHANNELS[j]][0]
             save_file = "{}_{}_{}.txt".format(pos, det, ch_label)

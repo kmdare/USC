@@ -13,22 +13,22 @@ from nptyping import NDArray, Float64
 
 
 def model(p, f):
-    Ax = p[0]
-    Ay = p[1]
-    Az = p[2]
-    offset = p[3]
-    det = p[4]
-    y = p[5]
-    Mx = p[6]
-    My = p[7]
-    Mz = p[8]
-    gx = p[9]
-    gy = p[10]
-    gz = p[11]
-    k1 = k2 = 0.5 * 193
-    px = {"d": det,  "k1": k1, "k2": k2, "y": y, "g": gx, "M": Mx, "N": 1E7}
-    py = {"d": det,  "k1": k1, "k2": k2, "y": y, "g": gy, "M": My, "N": 1E7}
-    pz = {"d": det,  "k1": k1, "k2": k2, "y": y, "g": gz, "M": Mz, "N": 1E7}
+    Ax      = p[0]
+    Ay      = p[1]
+    Az      = p[2]
+    offset  = p[3]
+    det     = p[4]
+    y       = p[5]
+    Mx      = p[6]
+    My      = p[7]
+    Mz      = p[8]
+    gx      = p[9]
+    gy      = p[10]
+    gz      = p[11]
+    k1      = k2 = 0.5 * 193
+    px      = {"d": det,  "k1": k1, "k2": k2, "y": y, "g": gx, "M": Mx, "N": 1E7}
+    py      = {"d": det,  "k1": k1, "k2": k2, "y": y, "g": gy, "M": My, "N": 1E7}
+    pz      = {"d": det,  "k1": k1, "k2": k2, "y": y, "g": gz, "M": Mz, "N": 1E7}
     return offset + (Ax * usc.models.Sxx(f, px)
                      + Ay * usc.models.Sxx(f, py)
                      + Az * usc.models.Sxx(f, pz))
@@ -43,9 +43,10 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()
 
-    load_path = filedialog.askdirectory(title="Choose Spectra Location")
-    save_path = filedialog.askdirectory(title="Choose Plot Save Location")
+    load_path = "/Users/jannekhansen/Desktop/Spectra of different days /20211112 - Full_Scan/Spectra"#filedialog.askdirectory(title="Choose Spectra Location")
+    save_path = "/Users/jannekhansen/Desktop/Spectra of different days /20211112 - Full_Scan/Figures"#filedialog.askdirectory(title="Choose Plot Save Location")
     files = os.listdir(load_path)
+    files = [file for file in files if ".txt" in file]
     file_tree = []
     for file in files:
         pos, det, label = file.split("_")
@@ -56,28 +57,29 @@ if __name__ == "__main__":
     print(file_tree)
     file_tree = sorted(file_tree, key=lambda tup: (tup[0], tup[1], tup[2]))
     print(file_tree)
-    t0 = datetime.datetime.now()
-    ts = numpy.array([])
-    Mxs = []
-    gxs = []
-    dets = []
-    chis = []
-    Ax = 1.5E-3
-    Ay = 3E-5
-    Az = 3E-4
-    offset = 1
-    y = 4
-    Mx = 185
-    My = 175
-    Mz = 40
-    gx = 0.3 * Mx
-    gy = 0.05 * My
-    gz = 0.2 * Mz
+    t0     = datetime.datetime.now()
+    ts     = numpy.array([])
+    Mxs    = []
+    gxs    = []
+    dets   = []
+    chis   = []
+    Ax     = 1.84E-3
+    Ay     = 2.76E-5
+    Az     = 3.9E-4
+    offset = 4.8
+    y      = 4
+    Mx     = 193.5
+    My     = 173
+    Mz     = 39
+    gx     = 0.21 * Mx
+    gy     = 0.035 * My
+    gz     = 0.23 * Mz
     files_of_interest = [file for file in file_tree
-                         if ("X" in file[0]) and (file[1] == 1280)]
+                         if ("X" in file[0]) and (file[1] == 0)]
+    print(files_of_interest)
     for i, file in enumerate(files_of_interest):
         (label, pos, det) = file
-        if det == 200:
+        if pos != 0:
             continue
         filename = "pos{}_det{}kHz_{}.txt".format(pos, det, label)
         load_filepath = os.path.join(load_path, filename)
@@ -101,6 +103,7 @@ if __name__ == "__main__":
         fit = model(p, f)
         px = p
         px[1:3] = 0
+        print(px[3])
         fit_x = model(px, f)
         k1 = k2 = 0.5 * 193
         px = {"d": p[4],  "k1": k1, "k2": k2, "y": p[5], "g": p[9], "M": p[6],
@@ -110,7 +113,7 @@ if __name__ == "__main__":
         ax1.set_ylim(1, 2E4)
         ax1.set_yscale('log', nonpositive='clip')
         ax1.plot(f, fit, "r--", alpha=0.2)
-        ax1.fill_between(f, fit_x, edgecolor="r", facecolor="r", alpha=0.3)
+        ax1.fill_between(f, fit_x, edgecolor="r", facecolor="r", alpha=0.3) #the fit taking into account the other 2 spectra
         ax1.plot(f, fit_x, "r", alpha=1)
         ax1.plot(f[numpy.logical_not(idxs)], Pxx[numpy.logical_not(idxs)],
                  "g.", markersize=1, alpha=0.5)
@@ -121,9 +124,11 @@ if __name__ == "__main__":
         print("\tGuess: {:.3g}".format(chisquare_0))
         print("\tFit: {:.3g}".format(chisquare))
         print("\n")
+        plt.savefig(save_path+'/'+str(det)+".pdf",dpi=300)
         dets = numpy.append(dets, p[4])
         gxs = numpy.append(gxs, p[9]/p[6])
         chis = numpy.append(chis, chisquare)
+        
     px["d"] = px["M"]
     plt.figure()
     plt.semilogy(f, usc.models.Sxx(f, px))
@@ -134,5 +139,4 @@ if __name__ == "__main__":
     print(numpy.mean(chis))
     print(numpy.std(chis))
     print(chis)
-
     plt.show()
